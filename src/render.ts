@@ -166,6 +166,15 @@ export default function render(s: State): void {
         pieceNode = createEl('piece', pieceName) as cg.PieceNode,
         pos = key2pos(k);
 
+        pieceNode.draggable = true;
+        pieceNode.ondragstart = (event: DragEvent) => {
+          console.log("ondragstart", piecesKeys[j]);
+          if (event.dataTransfer) event.dataTransfer.setData("key", piecesKeys[j]);
+          if (event.target) (event.target as HTMLElement).style.opacity = ".5";
+        };
+        pieceNode.ondragend = (event: DragEvent) => {
+          if (event.target) delete (event.target as HTMLElement).style.opacity;
+        };
         pieceNode.cgPiece = pieceName;
         pieceNode.cgKey = k;
         if (anim) {

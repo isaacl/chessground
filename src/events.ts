@@ -15,10 +15,12 @@ export function bindBoard(s: State): void {
   const boardEl = s.dom.elements.board,
   onStart = startDragOrDraw(s);
 
+  onStart;
+
   // Cannot be passive, because we prevent touch scrolling and dragging of
   // selected elements.
-  boardEl.addEventListener('touchstart', onStart as EventListener, { passive: false });
-  boardEl.addEventListener('mousedown', onStart as EventListener, { passive: false });
+  //boardEl.addEventListener('touchstart', onStart as EventListener, { passive: false });
+  //boardEl.addEventListener('mousedown', onStart as EventListener, { passive: false });
 
   if (s.disableContextMenu || s.drawable.enabled) {
     boardEl.addEventListener('contextmenu', e => e.preventDefault());
@@ -38,7 +40,7 @@ export function bindDocument(s: State, redrawAll: cg.Redraw): cg.Unbind {
     unbinds.push(unbindable(document.body, 'chessground.resize', onResize));
   }
 
-  if (!s.viewOnly) {
+  if (false && !s.viewOnly) {
 
     const onmove: MouchBind = dragOrDraw(s, drag.move, draw.move);
     const onend: MouchBind = dragOrDraw(s, drag.end, draw.end);

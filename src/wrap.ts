@@ -33,6 +33,10 @@ export default function wrap(element: HTMLElement, s: State, relative: boolean):
 
   const board = createEl('cg-board');
   container.appendChild(board);
+  board.ondragover = (event) => {
+    event.preventDefault();
+    console.log("ondragover board");
+  }
 
   let svg: SVGElement | undefined;
   if (s.drawable.visible && !relative) {
