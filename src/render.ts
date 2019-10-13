@@ -175,7 +175,7 @@ export default function render(s: State): void {
           console.log("ondragstart", piecesKeys[j]);
           if (event.dataTransfer) {
             event.dataTransfer.setData("key", piecesKeys[j]);
-            event.dataTransfer.effectAllowed = 'none';
+            event.dataTransfer.effectAllowed = 'moveCopy';
             // (event.dataTransfer as any).mozCursor = 'auto';
             // sigh.
             const offset = t.clientWidth * (navigator.userAgent.search("Firefox") > 0 ? 0.5 : 1);
@@ -186,7 +186,6 @@ export default function render(s: State): void {
               // sigh
               setTimeout(() => (t.style.opacity = ".1"), 0);
             } else t.style.opacity = ".1";
-            t.style.cursor = "none!important";
           }
         };
         pieceNode.ondragend = (event: DragEvent) => {

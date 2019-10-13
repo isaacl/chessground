@@ -34,8 +34,9 @@ export default function wrap(element: HTMLElement, s: State, relative: boolean):
   const board = createEl('cg-board');
   container.appendChild(board);
   board.ondragover = (event) => {
+    console.log("ondragover");
     event.preventDefault();
-    console.log("ondragover board");
+    event.dataTransfer!.dropEffect = 'none';
   }
 
   let svg: SVGElement | undefined;
