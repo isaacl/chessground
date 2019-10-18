@@ -4,7 +4,7 @@ import { whitePov } from './board'
 import * as util from './util'
 import { AnimCurrent, AnimVectors, AnimVector, AnimFadings } from './anim'
 import { DragCurrent } from './drag'
-import { onDragStart } from './dragHtml'
+import { onDragStart, onDragEnd } from './dragHtml'
 import * as cg from './types'
 
 // `$color $role`
@@ -171,10 +171,7 @@ export default function render(s: State): void {
           pieceNode.draggable = true;
           pieceNode.ondragstart = onDragStart(s); // maybe should make one closure for all pieces?
         }
-        pieceNode.ondragend = (event: DragEvent) => {
-          console.log("ondragend", piecesKeys[j]);
-          if (event.target) delete (event.target as HTMLElement).style.opacity;
-        };
+        pieceNode.ondragend = onDragEnd;
         pieceNode.cgPiece = pieceName;
         pieceNode.cgKey = k;
         if (anim) {

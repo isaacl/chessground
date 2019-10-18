@@ -5,11 +5,15 @@ import * as cg from './types';
 export const onDragStart = (s: State) => (e: DragEvent) => {
   if (!e.target || !e.dataTransfer) return;
   const t = e.target as HTMLElement,
-  position = [e.clientX, e.clientY] as cg.NumberPair,
+  // I'd prefer e.clientX but that seems to be the location the drag starts,
+  // e.clientX doesn't always refer to the right square but maybe there's
+  // a workaround.
+  rect = t.getBoundingClientRect(),
+  position = [rect.left + rect.width / 2, rect.top + rect.height / 2] as cg.NumberPair,
   orig = board.getKeyAtDomPos(position, board.whitePov(s), s.dom.bounds());
-  console.log("ondragstart", position, orig);
+  console.log("ondragstart", orig);
 
-  e.dataTransfer.setData("key", 'e5');
+  e.dataTransfer.setData('lichess.origin', orig!.toString());
   e.dataTransfer.effectAllowed = 'moveCopy';
   // (event.dataTransfer as any).mozCursor = 'auto';
   // sigh.
@@ -22,3 +26,8 @@ export const onDragStart = (s: State) => (e: DragEvent) => {
     setTimeout(() => (t.style.opacity = ".1"), 0);
   } else t.style.opacity = ".1";
 };
+
+export const onDragEnd = (e: DragEvent) => {
+  e.stopPropagation();
+  console.log("ondragend", e.dataTransfer!.getData('lichess.origin'))
+}
