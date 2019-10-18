@@ -4,9 +4,8 @@ import * as cg from './types';
 
 export const onDragStart = (s: State) => (e: DragEvent) => {
   if (!e.target || !e.dataTransfer) return;
-  e.preventDefault();
   const t = e.target as HTMLElement,
-  position = [e.offsetX + t.clientWidth / 2, e.offsetY + t.clientHeight / 2] as cg.NumberPair,
+  position = [e.clientX, e.clientY] as cg.NumberPair,
   orig = board.getKeyAtDomPos(position, board.whitePov(s), s.dom.bounds());
   console.log("ondragstart", position, orig);
 
