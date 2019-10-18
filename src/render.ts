@@ -4,6 +4,7 @@ import { whitePov } from './board'
 import * as util from './util'
 import { AnimCurrent, AnimVectors, AnimVector, AnimFadings } from './anim'
 import { DragCurrent } from './drag'
+import { onDragStart } from './dragHtml'
 import * as cg from './types'
 
 // `$color $role`
@@ -166,28 +167,10 @@ export default function render(s: State): void {
         pieceNode = createEl('piece', pieceName) as cg.PieceNode,
         pos = key2pos(k);
 
-        pieceNode.draggable = true;
-        pieceNode.ondragstart = (event: DragEvent) => {
-          if (!event.target) return;
-          const t = event.target as HTMLElement;
-          //event.preventDefault();
-          event.stopPropagation();
-          console.log("ondragstart", piecesKeys[j]);
-          if (event.dataTransfer) {
-            event.dataTransfer.setData("key", piecesKeys[j]);
-            event.dataTransfer.effectAllowed = 'moveCopy';
-            // (event.dataTransfer as any).mozCursor = 'auto';
-            // sigh.
-            const offset = t.clientWidth * (navigator.userAgent.search("Firefox") > 0 ? 0.5 : 1);
-            event.dataTransfer.setDragImage(t, offset, offset);
-          }
-          if (event.target) {
-            if (navigator.userAgent.search("Firefox") > 0) {
-              // sigh
-              setTimeout(() => (t.style.opacity = ".1"), 0);
-            } else t.style.opacity = ".1";
-          }
-        };
+        if (s.draggable.html5) {
+          pieceNode.draggable = true;
+          pieceNode.ondragstart = onDragStart(s); // maybe should make one closure for all pieces?
+        }
         pieceNode.ondragend = (event: DragEvent) => {
           console.log("ondragend", piecesKeys[j]);
           if (event.target) delete (event.target as HTMLElement).style.opacity;

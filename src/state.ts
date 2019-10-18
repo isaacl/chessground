@@ -63,6 +63,7 @@ export interface State {
   };
   draggable: {
     enabled: boolean; // allow moves & premoves to use drag'n drop
+    html5: boolean; // Use html5 drag and drop
     distance: number; // minimum distance to initiate a drag; in pixels
     autoDistance: boolean; // lets chessground set distance to zero when user drags pieces
     centerPiece: boolean; // center the piece on cursor at drag start
@@ -138,6 +139,7 @@ export function defaults(): Partial<State> {
     },
     draggable: {
       enabled: true,
+      html5: true,
       distance: 3,
       autoDistance: true,
       centerPiece: true,

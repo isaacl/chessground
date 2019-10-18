@@ -39,6 +39,11 @@ export default function wrap(element: HTMLElement, s: State, relative: boolean):
     event.dataTransfer!.dropEffect = 'none';
   }
 
+  board.ondragenter = (event) => {
+    console.log("ondragenter");
+    event.preventDefault();
+  }
+
   let svg: SVGElement | undefined;
   if (s.drawable.visible && !relative) {
     svg = createSVG('svg');
