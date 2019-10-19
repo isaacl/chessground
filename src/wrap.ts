@@ -4,6 +4,8 @@ import { files, ranks } from './types'
 import { createElement as createSVG } from './svg'
 import { Elements } from './types'
 
+import { onDrop } from './dragHtml'
+
 export default function wrap(element: HTMLElement, s: State, relative: boolean): Elements {
 
   // .cg-wrap (element passed to Chessground)
@@ -34,15 +36,17 @@ export default function wrap(element: HTMLElement, s: State, relative: boolean):
   const board = createEl('cg-board');
   container.appendChild(board);
   board.ondragover = (event) => {
-    console.log("ondragover");
+    console.debug("ondragover");
     event.preventDefault();
-    event.dataTransfer!.dropEffect = 'none';
+    event.dataTransfer!.dropEffect = 'move';
   }
 
   board.ondragenter = (event) => {
     console.log("ondragenter");
     event.preventDefault();
   }
+
+  board.ondrop = onDrop(s);
 
   let svg: SVGElement | undefined;
   if (s.drawable.visible && !relative) {
