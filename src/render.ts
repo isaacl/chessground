@@ -171,7 +171,7 @@ export default function render(s: State): void {
           pieceNode.draggable = true;
           pieceNode.ondragstart = onDragStart(s); // maybe should make one closure for all pieces?
         }
-        pieceNode.ondragend = onDragEnd;
+        pieceNode.ondragend = onDragEnd(s);
         pieceNode.cgPiece = pieceName;
         pieceNode.cgKey = k;
         if (anim) {

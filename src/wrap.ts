@@ -4,7 +4,7 @@ import { files, ranks } from './types'
 import { createElement as createSVG } from './svg'
 import { Elements } from './types'
 
-import { onDrop } from './dragHtml'
+import * as dragHtml from './dragHtml'
 
 export default function wrap(element: HTMLElement, s: State, relative: boolean): Elements {
 
@@ -46,7 +46,7 @@ export default function wrap(element: HTMLElement, s: State, relative: boolean):
     event.preventDefault();
   }
 
-  board.ondrop = onDrop(s);
+  board.ondrop = dragHtml.onDrop(s);
 
   let svg: SVGElement | undefined;
   if (s.drawable.visible && !relative) {
