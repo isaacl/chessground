@@ -18,7 +18,7 @@ export const onDragStart = (s: State) => (e: DragEvent) => {
   console.log("ondragstart", orig);
 
   if (s.drawable.enabled && s.drawable.eraseOnClick) // TODO || piece.color !== s.turnColor
-    drawClear();
+    drawClear(s);
 
   e.dataTransfer.setData(lichessKey, orig!.toString());
   e.dataTransfer.effectAllowed = 'move';
