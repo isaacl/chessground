@@ -5,6 +5,7 @@ import { clear as drawClear } from './draw'
 import { cancel as cancelJsDrag } from './drag'
 
 const lichessKey = 'application/lichess.origin'
+let justDropped = false;
 
 export const onDragStart = (s: State) => (e: DragEvent) => {
   if (!e.target || !e.dataTransfer) return;
@@ -23,6 +24,8 @@ export const onDragStart = (s: State) => (e: DragEvent) => {
   // The grabber cursor blocks more of the piece so offset it to grab the piece lower
   e.dataTransfer.setDragImage(t, offset, offset * 1.15);
 
+  justDropped = false;
+
   requestAnimationFrame(() => {
     // raf for firefox, so dragged image isn't ghosted
     t.classList.add('ghost');
@@ -38,8 +41,7 @@ export const onDragEnd = (s: State) => (e: DragEvent) => {
     board.whitePov(s), s.dom.bounds());
 
   console.log('ondragend', end);
-  cancelJsDrag(s);
-  board.unselect(s);
+  if (!justDropped) board.unselect(s);
   (e.target as HTMLElement).classList.remove('ghost');
 };
 
@@ -51,6 +53,7 @@ export const onDrop = (s: State) => (e: DragEvent) => {
   console.log("ondrop", orig, dest);
   if (!dest || !orig) return;
 
+  justDropped = true;
   e.preventDefault();
   board.unsetPremove(s);
   board.unsetPredrop(s);
@@ -58,5 +61,6 @@ export const onDrop = (s: State) => (e: DragEvent) => {
     s.stats.ctrlKey = e.ctrlKey;
     if (board.userMove(s, orig, dest)) s.stats.dragged = true;
   }
+  s.dom.redraw();
 
 };
