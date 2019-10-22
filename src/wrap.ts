@@ -36,13 +36,14 @@ export default function wrap(element: HTMLElement, s: State, relative: boolean):
   const board = createEl('cg-board');
   container.appendChild(board);
   board.ondragover = (event) => {
-    console.debug("ondragover");
+    // console.debug("ondragover");
     event.preventDefault();
     event.dataTransfer!.dropEffect = 'move';
   }
 
   board.ondragenter = (event) => {
-    console.log("ondragenter");
+    console.log("ondragenter", event.target);
+    // TODO ignore drags from unrelated elements / stuff
     event.preventDefault();
   }
 
