@@ -62,5 +62,12 @@ export const onDrop = (s: State) => (e: DragEvent) => {
     if (board.userMove(s, orig, dest)) s.stats.dragged = true;
   }
   s.dom.redraw();
-
 };
+
+export function squareDragEnter(e: DragEvent) {
+  (e.target as HTMLElement).classList.add('dragover');
+}
+
+export function squareDragLeave(e: DragEvent) {
+  (e.target as HTMLElement).classList.remove('dragover');
+}

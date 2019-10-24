@@ -4,7 +4,7 @@ import { whitePov } from './board'
 import * as util from './util'
 import { AnimCurrent, AnimVectors, AnimVector, AnimFadings } from './anim'
 import { DragCurrent } from './drag'
-import { onDragStart, onDragEnd } from './dragHtml'
+import { onDragStart, onDragEnd, squareDragEnter, squareDragLeave } from './dragHtml'
 import * as cg from './types'
 
 // `$color $role`
@@ -128,6 +128,10 @@ export default function render(s: State): void {
         squareNode.cgKey = sk as cg.Key;
         translate(squareNode, translation);
         boardEl.insertBefore(squareNode, boardEl.firstChild);
+        if (s.draggable.html5) {
+          squareNode.ondragenter = squareDragEnter;
+          squareNode.ondragleave = squareDragLeave;
+        }
       }
     }
   }
