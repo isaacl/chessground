@@ -17,12 +17,17 @@ export const onDragStart = (s: State) => (e: DragEvent) => {
 
   e.dataTransfer.setData(lichessKey, orig.toString());
   e.dataTransfer.effectAllowed = 'move';
-  // (event.dataTransfer as any).mozCursor = 'auto';
-  // sigh.
+  // TODO: fix before merge..
   const offset = (s.dom.bounds().width / 8) / (navigator.userAgent.search("Firefox") > 0 ? window.devicePixelRatio : 1);
-  // The grabber cursor blocks more of the piece so offset it to grab the piece lower
   e.dataTransfer.setDragImage(t, offset, offset);
 
+
+  // TODO: tweak timing of removing old drag image?
+  // once drag begins, mouse movements no longer get reported, so
+  // js drag piece can be in wrong place.  But drag image takes a bit
+  // to display so removing the old render too fast means a flash
+  // maybe use dragover to update coordinates to drag and delay
+  // removing drag image for a bit
   requestAnimationFrame(() => {
     // raf for firefox, so dragged image isn't ghosted
     t.classList.add('ghost');
@@ -30,6 +35,7 @@ export const onDragStart = (s: State) => (e: DragEvent) => {
     // cancel in raf to avoid a flash
     cancelJsDrag(s);
     board.selectSquare(s, orig);
+    s.dom.redraw();
   });
 }
 
@@ -57,10 +63,21 @@ export const onDrop = (s: State) => (e: DragEvent) => {
   s.dom.redraw();
 };
 
-export function squareDragEnter(e: DragEvent) {
+export const squareDragEnter = (e: DragEvent) => {
   (e.target as HTMLElement).classList.add('dragover');
 }
 
-export function squareDragLeave(e: DragEvent) {
+export const squareDragLeave = (e: DragEvent) => {
   (e.target as HTMLElement).classList.remove('dragover');
+}
+
+export const boardDragEnter = (board: HTMLElement) => (e: DragEvent) => {
+  if (e.target !== board) return;
+  if (e.dataTransfer!.types.indexOf(lichessKey) < 0) return;
+  e.preventDefault();
+}
+
+export const boardDragOver = (e: DragEvent) => {
+  // required to accept drops.
+  e.preventDefault();
 }

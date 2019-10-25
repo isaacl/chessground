@@ -35,18 +35,8 @@ export default function wrap(element: HTMLElement, s: State, relative: boolean):
 
   const board = createEl('cg-board');
   container.appendChild(board);
-  board.ondragover = (event) => {
-    // console.debug("ondragover");
-    event.preventDefault();
-    event.dataTransfer!.dropEffect = 'move';
-  }
-
-  board.ondragenter = (event) => {
-    console.log("ondragenter", event.target);
-    // TODO ignore drags from unrelated elements / stuff
-    event.preventDefault();
-  }
-
+  board.ondragover = dragHtml.boardDragOver;
+  board.ondragenter = dragHtml.boardDragEnter(board);
   board.ondrop = dragHtml.onDrop(s);
 
   let svg: SVGElement | undefined;
