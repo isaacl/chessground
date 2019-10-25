@@ -86,7 +86,7 @@ export const squareDragLeave = (e: DragEvent) => {
   (e.target as HTMLElement).classList.remove('dragover');
 }
 
-// This event does not seem to matter but according to spec must be canceled.
+// Des not seem to matter but spec says must be canceled.
 export const boardDragEnter = (board: HTMLElement) => (e: DragEvent) => {
   console.log('dragenter', e.target, dragOrigin);
   if (e.target !== board || !dragOrigin) return;
@@ -99,6 +99,7 @@ export const boardDragOver = (s: State) => (e: DragEvent) => {
   // Update js drag location to bridge gap until drag image is displayed.
   dragJs.move(s, e as cg.MouchEvent);
 
+  // TODO: disable drop on bad coords?
   e.dataTransfer!.dropEffect = 'move';
   // required to accept drops.
   e.preventDefault();
