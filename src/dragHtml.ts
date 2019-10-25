@@ -2,63 +2,78 @@ import * as board from './board';
 import { State } from './state';
 import * as cg from './types';
 import { clear as drawClear } from './draw'
-import { cancel as cancelJsDrag } from './drag'
+import * as dragJs from './drag'
+import * as util from './util'
 
-const lichessKey = 'application/lichess.origin'
+let dragOrigin: cg.Key | undefined;
+
+let dragCancelCallback: number | undefined;
 
 export const onDragStart = (s: State) => (e: DragEvent) => {
   if (!e.target || !e.dataTransfer) return;
   const t = e.target as cg.PieceNode,
-  orig = t.cgKey;
-  console.log("ondragstart", orig);
+  orig = t.cgKey,
+  piece = s.pieces[orig];
 
-  if (s.drawable.enabled && s.drawable.eraseOnClick) // TODO || piece.color !== s.turnColor
+  console.log("ondragstart", orig, piece);
+
+  if (!orig || !piece || !board.isDraggable(s, orig)) return;
+
+  if (s.drawable.enabled && (s.drawable.eraseOnClick || piece.color !== s.turnColor))
     drawClear(s);
 
-  e.dataTransfer.setData(lichessKey, orig.toString());
+  dragOrigin = orig;
+
+  // Firefox requires data to start a drag...
+  e.dataTransfer.setData('application/lichess', 'dummy');
+
   e.dataTransfer.effectAllowed = 'move';
   // TODO: fix before merge..
   const offset = (s.dom.bounds().width / 8) / (navigator.userAgent.search("Firefox") > 0 ? window.devicePixelRatio : 1);
   e.dataTransfer.setDragImage(t, offset, offset);
 
+  if (s.selected !== orig) {
+    board.setSelected(s, orig);
+    s.hold.start();
+  }
 
-  // TODO: tweak timing of removing old drag image?
-  // once drag begins, mouse movements no longer get reported, so
-  // js drag piece can be in wrong place.  But drag image takes a bit
-  // to display so removing the old render too fast means a flash
-  // maybe use dragover to update coordinates to drag and delay
-  // removing drag image for a bit
-  requestAnimationFrame(() => {
-    // raf for firefox, so dragged image isn't ghosted
-    t.classList.add('ghost');
+  // raf for firefox, so dragged image isn't ghosted
+  requestAnimationFrame(() => t.classList.add('ghost'))
 
-    // cancel in raf to avoid a flash
-    cancelJsDrag(s);
+  dragCancelCallback = setTimeout(() => {
+    dragCancelCallback = undefined;
+    // cancel in timeout to avoid flash from slow drag image.
+    dragJs.cancel(s);
     board.selectSquare(s, orig);
     s.dom.redraw();
-  });
+  }, 150);
 }
 
 export const onDragEnd = (s: State) => (e: DragEvent) => {
+  dragOrigin = undefined;
   (e.target as HTMLElement).classList.remove('ghost');
   board.unselect(s);
+  if (dragCancelCallback) {
+    clearTimeout(dragCancelCallback);
+    dragCancelCallback = undefined;
+    dragJs.cancel(s);
+  }
   s.dom.redraw();
 };
 
 export const onDrop = (s: State) => (e: DragEvent) => {
-  const dest = board.getKeyAtDomPos([e.clientX, e.clientY] as cg.NumberPair,
-    board.whitePov(s), s.dom.bounds()),
-  orig = e.dataTransfer!.getData(lichessKey) as cg.Key;
-
-  console.log("ondrop", orig, dest);
-  if (!dest || !orig) return;
+  const pos = util.eventPosition(e as cg.MouchEvent);
+  if (!pos) return;
+  const dest = board.getKeyAtDomPos(pos, board.whitePov(s), s.dom.bounds());
+  console.log("ondrop", dragOrigin, dest);
+  if (!dest || !dragOrigin) return;
 
   e.preventDefault();
   board.unsetPremove(s);
   board.unsetPredrop(s);
-  if (orig !== dest) {
+  if (dragOrigin !== dest) {
     s.stats.ctrlKey = e.ctrlKey;
-    if (board.userMove(s, orig, dest)) s.stats.dragged = true;
+    if (board.userMove(s, dragOrigin, dest)) s.stats.dragged = true;
   }
   s.dom.redraw();
 };
@@ -71,13 +86,20 @@ export const squareDragLeave = (e: DragEvent) => {
   (e.target as HTMLElement).classList.remove('dragover');
 }
 
+// This event does not seem to matter but according to spec must be canceled.
 export const boardDragEnter = (board: HTMLElement) => (e: DragEvent) => {
-  if (e.target !== board) return;
-  if (e.dataTransfer!.types.indexOf(lichessKey) < 0) return;
+  console.log('dragenter', e.target, dragOrigin);
+  if (e.target !== board || !dragOrigin) return;
   e.preventDefault();
 }
 
-export const boardDragOver = (e: DragEvent) => {
+export const boardDragOver = (s: State) => (e: DragEvent) => {
+  if (!dragOrigin) return;
+
+  // Update js drag location to bridge gap until drag image is displayed.
+  dragJs.move(s, e as cg.MouchEvent);
+
+  e.dataTransfer!.dropEffect = 'move';
   // required to accept drops.
   e.preventDefault();
 }

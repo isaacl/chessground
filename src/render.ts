@@ -128,7 +128,7 @@ export default function render(s: State): void {
         squareNode.cgKey = sk as cg.Key;
         translate(squareNode, translation);
         boardEl.insertBefore(squareNode, boardEl.firstChild);
-        if (s.draggable.html5) {
+        if (s.draggable.enabled && s.draggable.html5) {
           squareNode.ondragenter = squareDragEnter;
           squareNode.ondragleave = squareDragLeave;
         }
@@ -171,7 +171,7 @@ export default function render(s: State): void {
         pieceNode = createEl('piece', pieceName) as cg.PieceNode,
         pos = key2pos(k);
 
-        if (s.draggable.html5) {
+        if (s.draggable.enabled && s.draggable.html5) {
           pieceNode.draggable = true;
           pieceNode.ondragstart = onDragStart(s); // maybe should make one closure for all pieces?
         }

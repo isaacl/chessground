@@ -64,7 +64,8 @@ export interface SetPremoveMetadata {
 
 export type WindowEvent = 'onscroll' | 'onresize';
 
-export type MouchEvent = MouseEvent & TouchEvent;
+// TODO: this should be union!
+export type MouchEvent = MouseEvent & TouchEvent & DragEvent;
 
 export interface KeyedNode extends HTMLElement {
   cgKey: Key;

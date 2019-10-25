@@ -15,8 +15,6 @@ export function bindBoard(s: State): void {
   const boardEl = s.dom.elements.board,
   onStart = startDragOrDraw(s);
 
-  onStart;
-
   // Cannot be passive, because we prevent touch scrolling and dragging of
   // selected elements.
   boardEl.addEventListener('touchstart', onStart as EventListener, { passive: false });

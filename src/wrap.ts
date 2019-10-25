@@ -35,8 +35,8 @@ export default function wrap(element: HTMLElement, s: State, relative: boolean):
 
   const board = createEl('cg-board');
   container.appendChild(board);
-  board.ondragover = dragHtml.boardDragOver;
-  board.ondragenter = dragHtml.boardDragEnter(board);
+  board.ondragover = dragHtml.boardDragOver(s);
+  //board.ondragenter = dragHtml.boardDragEnter(board);
   board.ondrop = dragHtml.onDrop(s);
 
   let svg: SVGElement | undefined;

@@ -140,7 +140,7 @@ export function defaults(): Partial<State> {
     draggable: {
       enabled: true,
       html5: true,
-      distance: 3,
+      distance: 3, // TODO: this can't be adjusted with html drag.
       autoDistance: true,
       centerPiece: true,
       showGhost: true,
